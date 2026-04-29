@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI PM Competency Assessment — Building with AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--navy:#0D1B2A;--navy2:#162437;--teal:#0EA5A0;--teal-l:#5ECECA;--teal-d:rgba(14,165,160,0.12);--purple:#7C5CFC;--purple-d:rgba(124,92,252,0.12);--amber:#F59E0B;--amber-d:rgba(245,158,11,0.12);--blue:#3B82F6;--blue-d:rgba(59,130,246,0.12);--red:#EF4444;--green:#10B981;--bdr:rgba(255,255,255,0.07);--bdr2:rgba(255,255,255,0.12);--txt:#F0F4F8;--txt2:#94A3B8;--txt3:#64748B;--card:rgba(255,255,255,0.035);--card2:rgba(255,255,255,0.06);--r:12px;--rl:16px;--rxl:20px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--txt);min-height:100vh;overflow-x:hidden}
+.bg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(14,165,160,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(14,165,160,.03) 1px,transparent 1px);background-size:40px 40px}
+.bg-g1{position:fixed;width:600px;height:600px;border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(14,165,160,.06) 0%,transparent 70%);top:-200px;right:-200px}
+.bg-g2{position:fixed;width:500px;height:500px;border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(124,92,252,.05) 0%,transparent 70%);bottom:-100px;left:-100px}
+#app{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 80px}
+.site-hdr{padding:28px 0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bdr)}
+.logo{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--teal);display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--teal)}
+.hnav{display:flex;gap:6px}
+.nbtn{font-family:'DM Sans',sans-serif;font-size:13px;padding:6px 14px;border-radius:8px;border:1px solid var(--bdr2);background:transparent;color:var(--txt2);cursor:pointer;transition:all .2s}
+.nbtn:hover{background:var(--card2);color:var(--txt)}
+.nbtn.on{background:var(--teal-d);color:var(--teal-l);border-color:rgba(14,165,160,.3)}
+.hero{padding:52px 0 44px;display:grid;grid-template-columns:1fr 340px;gap:48px;align-items:center}
+.eyebrow{font-family:'Syne',sans-serif;font-size:11px;font-weight:600;color:var(--teal);letter-spacing:.15em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--teal)}
+.htitle{font-family:'Syne',sans-serif;font-size:clamp(30px,4vw,46px);font-weight:800;line-height:1.1;margin-bottom:14px}
+.htitle span{color:var(--teal)}
+.hbody{font-size:15px;line-height:1.7;color:var(--txt2);margin-bottom:28px}
+.hstats{display:flex;gap:28px}
+.snum{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;line-height:1}
+.slbl{font-size:12px;color:var(--txt3);margin-top:3px}
+.hcard{background:var(--card2);border:1px solid var(--bdr2);border-radius:var(--rxl);padding:22px}
+.pslbl{font-size:11px;font-weight:500;color:var(--txt3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px}
+.oscore{font-family:'Syne',sans-serif;font-size:50px;font-weight:800;color:var(--teal);line-height:1;margin-bottom:2px}
+.odenom{font-size:18px;color:var(--txt3)}
+.olbl{font-size:13px;color:var(--txt2);margin-bottom:18px}
+.dmbs{display:flex;flex-direction:column;gap:9px}
+.dmbr{display:flex;align-items:center;gap:9px}
+.dmbl{font-size:12px;color:var(--txt2);min-width:88px}
+.dmbt{flex:1;height:5px;border-radius:3px;background:var(--bdr2);overflow:hidden}
+.dmbf{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.dmbv{font-size:12px;color:var(--txt3);min-width:28px;text-align:right}
+.rpill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:5px 12px;border-radius:20px;margin-top:14px;background:var(--teal-d);color:var(--teal);border:1px solid rgba(14,165,160,.2)}
+.rpdot{width:6px;height:6px;border-radius:50%;background:var(--teal)}
+.secttitle{font-family:'Syne',sans-serif;font-size:19px;font-weight:700}
+.sectcount{font-size:13px;color:var(--txt3)}
+.sectrow{display:flex;align-items:baseline;gap:10px;margin-bottom:22px}
+.sectact{margin-left:auto;display:flex;gap:8px}
+.dtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.dtab{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:7px 16px;border-radius:10px;border:1px solid var(--bdr2);background:transparent;color:var(--txt2);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px}
+.dtab:hover{background:var(--card2);color:var(--txt)}
+.dtab.on{color:var(--txt);border-color:transparent}
+.td1.on{background:var(--teal-d);border-color:rgba(14,165,160,.25);color:var(--teal-l)}
+.td2.on{background:var(--purple-d);border-color:rgba(124,92,252,.25);color:#A78BFA}
+.td3.on{background:var(--blue-d);border-color:rgba(59,130,246,.25);color:#93C5FD}
+.td4.on{background:var(--amber-d);border-color:rgba(245,158,11,.25);color:#FCD34D}
+.tpip{font-size:11px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--card2)}
+.cgrid{display:flex;flex-direction:column;gap:7px}
+.ccard{background:var(--card);border:1px solid var(--bdr);border-radius:var(--rl);overflow:hidden;transition:border-color .2s}
+.ccard:hover{border-color:var(--bdr2)}
+.ccard.exp{border-color:var(--bdr2)}
+.chdr{padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;user-select:none}
+.cstat{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--bdr2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;transition:all .2s}
+.cinfo{flex:1;min-width:0}
+.ccode{font-size:11px;color:var(--txt3);font-weight:500;letter-spacing:.06em;margin-bottom:2px}
+.cname{font-size:14px;font-weight:500;color:var(--txt)}
+.cmeta{display:flex;align-items:center;gap:7px;margin-top:3px}
+.ttag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;letter-spacing:.04em;text-transform:uppercase}
+.tk{background:rgba(59,130,246,.15);color:#93C5FD}
+.ts{background:rgba(16,185,129,.15);color:#6EE7B7}
+.cright{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.lpill{font-size:12px;font-weight:500;padding:3px 11px;border-radius:20px;white-space:nowrap;transition:all .2s}
+.lp0{background:var(--card2);color:var(--txt3)}
+.lp1{background:rgba(239,68,68,.15);color:#FCA5A5}
+.lp2{background:rgba(245,158,11,.15);color:#FCD34D}
+.lp3{background:rgba(59,130,246,.15);color:#93C5FD}
+.lp4{background:rgba(16,185,129,.15);color:#6EE7B7}
+.xicon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:var(--txt3);transition:transform .2s}
+.xicon.open{transform:rotate(180deg)}
+.cbody{display:none;border-top:1px solid var(--bdr)}
+.cbody.open{display:block}
+.cinner{padding:18px}
+.lgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:18px}
+.lgc{border:1.5px solid var(--bdr);border-radius:var(--r);padding:10px;cursor:pointer;transition:all .2s;background:transparent}
+.lgc:hover{background:var(--card2);border-color:var(--bdr2)}
+.lgn{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:2px}
+.lgnm{font-size:11px;font-weight:600;letter-spacing:.04em;margin-bottom:6px}
+.lgl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.lgd{font-size:11px;color:var(--txt2);line-height:1.4;margin-bottom:5px}
+.l1 .lgn,.l1 .lgnm{color:#FCA5A5}.l2 .lgn,.l2 .lgnm{color:#FCD34D}.l3 .lgn,.l3 .lgnm{color:#93C5FD}.l4 .lgn,.l4 .lgnm{color:#6EE7B7}
+.l1.sel{border-color:#EF4444;background:rgba(239,68,68,.08)}.l2.sel{border-color:#F59E0B;background:rgba(245,158,11,.08)}.l3.sel{border-color:#3B82F6;background:rgba(59,130,246,.08)}.l4.sel{border-color:#10B981;background:rgba(16,185,129,.08)}
+.isect{margin-top:14px}
+.ilbl{font-size:11px;font-weight:600;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.iitem{display:flex;align-items:flex-start;gap:7px;padding:7px 9px;border-radius:7px;border:1px solid var(--bdr);cursor:pointer;transition:all .2s;background:transparent}
+.iitem:hover{border-color:var(--bdr2);background:var(--card2)}
+.iitem.chk{border-color:rgba(14,165,160,.4);background:rgba(14,165,160,.07)}
+.ichk{width:14px;height:14px;border-radius:4px;border:1.5px solid var(--bdr2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.iitem.chk .ichk{background:var(--teal);border-color:var(--teal)}
+.itxt{font-size:12px;color:var(--txt2);line-height:1.4}
+/* Results */
+.rhero{background:var(--card);border:1px solid var(--bdr2);border-radius:var(--rxl);padding:32px;margin-bottom:22px;position:relative;overflow:hidden}
+.rhero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--purple))}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.rltag{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:7px}
+.rlname{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;line-height:1.1;margin-bottom:10px}
+.rldesc{font-size:14px;line-height:1.7;color:var(--txt2);margin-bottom:18px}
+.rmets{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.rmc{background:var(--card2);border-radius:var(--r);padding:11px 9px;text-align:center}
+.rmv{font-family:'Syne',sans-serif;font-size:21px;font-weight:700}
+.rml{font-size:11px;color:var(--txt3);margin-top:2px}
+.radarc{height:270px;position:relative}
+/* Heatmap */
+.hmgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px}
+.hmcell{padding:11px 13px;border-radius:var(--r);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.hmname{font-size:12px;color:var(--txt2);flex:1;line-height:1.3}
+.hmscore{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;flex-shrink:0;margin-left:7px}
+.hm1{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2)}.hm1 .hmscore{color:#FCA5A5}
+.hm2{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)}.hm2 .hmscore{color:#FCD34D}
+.hm3{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.2)}.hm3 .hmscore{color:#93C5FD}
+.hm4{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.2)}.hm4 .hmscore{color:#6EE7B7}
+.hmx{opacity:.45}
+/* Learning path */
+.lpdomain{margin-bottom:28px}
+.lpdhdr{display:flex;align-items:center;gap:10px;margin-bottom:13px;padding-bottom:11px;border-bottom:1px solid var(--bdr)}
+.lpdbadge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:5px;text-transform:uppercase;letter-spacing:.06em}
+.lpdtitle{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+.lpdgap{font-size:12px;color:var(--txt3);margin-left:auto}
+.lpres{display:flex;flex-direction:column;gap:7px}
+.lpr{display:flex;align-items:stretch;background:var(--card);border:1px solid var(--bdr);border-radius:var(--rl);overflow:hidden;transition:border-color .2s}
+.lpr:hover{border-color:var(--bdr2)}
+.lpra{width:3px;flex-shrink:0}
+.lprb{padding:13px 15px;flex:1}
+.lprtop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:5px}
+.lprname{font-size:14px;font-weight:500;color:var(--txt);line-height:1.3}
+.lprtags{display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0}
+.rtag{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.rfree{background:rgba(16,185,129,.15);color:#6EE7B7}.rpaid{background:rgba(245,158,11,.1);color:#FCD34D}
+.rvideo{background:rgba(124,92,252,.15);color:#C4B5FD}.rbook{background:rgba(239,68,68,.1);color:#FCA5A5}
+.rcourse{background:rgba(59,130,246,.15);color:#93C5FD}.rarticle{background:rgba(14,165,160,.15);color:var(--teal-l)}
+.rdocs{background:rgba(100,116,139,.2);color:#94A3B8}.rpri{background:rgba(239,68,68,.15);color:#FCA5A5}
+.lprdesc{font-size:12px;color:var(--txt3);line-height:1.5;margin-bottom:7px}
+.lprlink{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--teal);text-decoration:none;transition:opacity .2s}
+.lprlink:hover{opacity:.7}
+.lprwhy{font-size:11px;color:var(--txt3);font-style:italic;padding-top:5px;border-top:1px solid var(--bdr);margin-top:5px}
+.abar{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:28px}
+.btn{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:9px 18px;border-radius:9px;border:1px solid var(--bdr2);cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;color:var(--txt2);background:transparent}
+.btn:hover{background:var(--card2);color:var(--txt)}
+.btn-p{background:var(--teal)!important;color:var(--navy)!important;border-color:var(--teal)!important;font-weight:600}
+.btn-p:hover{opacity:.88}
+.btn svg{width:14px;height:14px}
+.fbar{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px;align-items:center}
+.flbl{font-size:12px;color:var(--txt3);margin-right:3px}
+.fbtn{font-size:11px;font-weight:500;padding:4px 11px;border-radius:20px;border:1px solid var(--bdr2);background:transparent;color:var(--txt2);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.fbtn:hover{background:var(--card2)}
+.fbtn.on{background:var(--teal-d);color:var(--teal-l);border-color:rgba(14,165,160,.3)}
+.cbbar{position:sticky;top:0;z-index:100;background:var(--navy2);border-bottom:1px solid var(--bdr);padding:9px 24px;display:flex;align-items:center;gap:14px}
+.cblbl{font-size:13px;color:var(--txt2);white-space:nowrap}
+.cbtrack{flex:1;height:4px;background:var(--bdr2);border-radius:2px;overflow:hidden}
+.cbfill{height:100%;background:linear-gradient(90deg,var(--teal),var(--purple));border-radius:2px;transition:width .4s}
+.cbpct{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--teal);white-space:nowrap}
+.toast{position:fixed;bottom:24px;right:24px;z-index:1000;background:var(--card2);border:1px solid var(--bdr2);border-radius:var(--r);padding:11px 15px;font-size:13px;color:var(--txt);transform:translateY(20px);opacity:0;transition:all .3s;pointer-events:none;display:flex;align-items:center;gap:7px;backdrop-filter:blur(12px)}
+.toast.show{transform:translateY(0);opacity:1}
+.tdot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.divider{height:1px;background:var(--bdr);margin:28px 0}
+.cd1{color:var(--teal-l)}.cd2{color:#C4B5FD}.cd3{color:#93C5FD}.cd4{color:#FCD34D}
+.bd1{background:var(--teal)}.bd2{background:var(--purple)}.bd3{background:var(--blue)}.bd4{background:var(--amber)}
+.tbd1{background:var(--teal-d);color:var(--teal-l)}.tbd2{background:var(--purple-d);color:#C4B5FD}.tbd3{background:var(--blue-d);color:#93C5FD}.tbd4{background:var(--amber-d);color:#FCD34D}
+@media(max-width:768px){.hero{grid-template-columns:1fr}.hcard{display:none}.lgrid{grid-template-columns:1fr 1fr}.igrid{grid-template-columns:1fr}.rmets{grid-template-columns:repeat(2,1fr)}.rgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div><div class="bg-g1"></div><div class="bg-g2"></div>
+
+<div class="cbbar">
+  <span class="cblbl">Progress</span>
+  <div class="cbtrack"><div class="cbfill" id="cbf" style="width:0%"></div></div>
+  <span class="cbpct" id="cbp">0 / 24</span>
+  <button class="btn btn-p" id="vrBtn" onclick="showR()" style="display:none;padding:5px 14px;font-size:12px">View results →</button>
+</div>
+
+<div id="app">
+  <header class="site-hdr">
+    <div class="logo"><div class="logo-dot"></div>Building with AI</div>
+    <nav class="hnav">
+      <button class="nbtn on" id="nb0" onclick="sv('a')">Assessment</button>
+      <button class="nbtn" id="nb1" onclick="sv('r')">Results & Path</button>
+    </nav>
+  </header>
+
+  <!-- ASSESS -->
+  <div id="aView">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Competency Framework</div>
+        <h1 class="htitle">AI Product Manager<br><span>Readiness Assessment</span></h1>
+        <p class="hbody">Rate yourself across 24 competencies in 4 domains. Get a personalised readiness profile, gap analysis, and curated learning path mapped to proven resources.</p>
+        <div class="hstats">
+          <div><div class="snum">24</div><div class="slbl">competencies</div></div>
+          <div><div class="snum">4</div><div class="slbl">domains</div></div>
+          <div><div class="snum">~20</div><div class="slbl">minutes</div></div>
+        </div>
+      </div>
+      <div class="hcard">
+        <div class="pslbl">Your current score</div>
+        <div><span class="oscore" id="hs">—</span><span class="odenom"> / 4.0</span></div>
+        <div class="olbl" id="hl">Rate competencies to begin</div>
+        <div class="dmbs">
+          <div class="dmbr"><span class="dmbl cd1">D1 Fluency</span><div class="dmbt"><div class="dmbf bd1" id="b-d1" style="width:0%"></div></div><span class="dmbv" id="v-d1">—</span></div>
+          <div class="dmbr"><span class="dmbl cd2">D2 Strategy</span><div class="dmbt"><div class="dmbf bd2" id="b-d2" style="width:0%"></div></div><span class="dmbv" id="v-d2">—</span></div>
+          <div class="dmbr"><span class="dmbl cd3">D3 Building</span><div class="dmbt"><div class="dmbf bd3" id="b-d3" style="width:0%"></div></div><span class="dmbv" id="v-d3">—</span></div>
+          <div class="dmbr"><span class="dmbl cd4">D4 Governance</span><div class="dmbt"><div class="dmbf bd4" id="b-d4" style="width:0%"></div></div><span class="dmbv" id="v-d4">—</span></div>
+        </div>
+        <div class="rpill"><div class="rpdot"></div><span id="rpt">Not started</span></div>
+      </div>
+    </div>
+    <div class="dtabs" id="dtabs"></div>
+    <div id="dpanels"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="rView" style="display:none;padding-top:28px">
+    <div class="rhero">
+      <div class="rgrid">
+        <div>
+          <div class="rltag">Readiness profile</div>
+          <div class="rlname" id="rln">—</div>
+          <div class="rldesc" id="rld">—</div>
+          <div class="rmets">
+            <div class="rmc"><div class="rmv" id="rm1">—</div><div class="rml">Avg score</div></div>
+            <div class="rmc"><div class="rmv" id="rm2">—</div><div class="rml">Rated</div></div>
+            <div class="rmc"><div class="rmv" id="rm3">—</div><div class="rml">Proficient+</div></div>
+            <div class="rmc"><div class="rmv" id="rm4">—</div><div class="rml">Gap areas</div></div>
+          </div>
+        </div>
+        <div class="radarc"><canvas id="rc" role="img" aria-label="Radar chart showing competency scores across four domains"></canvas></div>
+      </div>
+    </div>
+    <div class="abar">
+      <button class="btn btn-p" onclick="dlPDF()"><svg viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 10v1a1 1 0 001 1h8a1 1 0 001-1v-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Download PDF report</button>
+      <button class="btn" onclick="copyLink()"><svg viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="11" cy="11" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="3" cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.4 7.8l5.2 2.5M9.6 3.7L4.4 6.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Copy share link</button>
+      <button class="btn" onclick="sv('a')"><svg viewBox="0 0 14 14" fill="none"><path d="M2 7h10M6 3l-4 4 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Back to assessment</button>
+    </div>
+    <div class="sectrow"><div class="secttitle">Competency heatmap</div><div class="sectcount" id="hmc"></div></div>
+    <div class="hmgrid" id="hmg"></div>
+    <div class="divider"></div>
+    <div class="sectrow"><div class="secttitle">Personalised learning path</div><div class="sectcount" id="lpc"></div></div>
+    <div class="fbar">
+      <span class="flbl">Filter:</span>
+      <button class="fbtn on" onclick="sf('all',this)">All</button>
+      <button class="fbtn" onclick="sf('free',this)">Free only</button>
+      <button class="fbtn" onclick="sf('gaps',this)">Priority gaps</button>
+      <button class="fbtn" onclick="sf('video',this)">Video</button>
+      <button class="fbtn" onclick="sf('book',this)">Books</button>
+      <button class="fbtn" onclick="sf('course',this)">Courses</button>
+    </div>
+    <div id="lp"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><div class="tdot"></div><span id="tmsg"></span></div>
+
+<script>
+const LV=[{n:1,nm:"Foundational",c:"#EF4444"},{n:2,nm:"Developing",c:"#F59E0B"},{n:3,nm:"Proficient",c:"#3B82F6"},{n:4,nm:"Advanced",c:"#10B981"}];
+
+const RES={
+d1:[
+  {name:"Intro to Large Language Models — Andrej Karpathy",type:"video",cost:"free",url:"https://www.youtube.com/watch?v=zjkBMFhNj_g",desc:"The best 1-hr technical explainer of LLMs for non-specialists. Covers tokenisation, training, RLHF, and agents.",forLv:[1,2],comp:"LLM mechanics"},
+  {name:"But what is a GPT? — 3Blue1Brown",type:"video",cost:"free",url:"https://www.youtube.com/watch?v=wjZofJX0v4M",desc:"Visual, intuition-building intro to transformers. Gentler on-ramp alongside Karpathy.",forLv:[1],comp:"LLM mechanics"},
+  {name:"Generative AI for Everyone — Andrew Ng, Coursera",type:"course",cost:"free",url:"https://www.coursera.org/learn/generative-ai-for-everyone",desc:"Covers LLMs, prompting, RAG, and agents at a conceptual level. Accessible and directly relevant.",forLv:[1,2],comp:"AI stack",pri:true},
+  {name:"LLM Bootcamp — The Full Stack (YouTube)",type:"video",cost:"free",url:"https://www.youtube.com/playlist?list=PL1T8fO7ArWleMMI8KPJ_5D5XSlovTW_Ur",desc:"8 lectures covering LLMs in production, UX for AI, and deployment. Strong production focus.",forLv:[2,3],comp:"AI stack"},
+  {name:"LLM-powered Autonomous Agents — Lilian Weng",type:"article",cost:"free",url:"https://lilianweng.github.io/posts/2023-06-23-agent/",desc:"The definitive long-form overview of agent architectures — tools, memory, planning. Dense but essential.",forLv:[2,3],comp:"Agent architecture",pri:true},
+  {name:"Functions, Tools and Agents with LangChain — DeepLearning.AI",type:"course",cost:"free",url:"https://www.deeplearning.ai/short-courses/functions-tools-agents-langchain/",desc:"Directly covers tool-calling and agent patterns. Free, short, accessible to non-engineers.",forLv:[2,3],comp:"Agent architecture"},
+  {name:"Anthropic Model Card — Claude",type:"docs",cost:"free",url:"https://www.anthropic.com/research/model-card-claude-3",desc:"Primary source. Read as a PM: extract capability boundaries, limitations, and appropriate use cases.",forLv:[2,3],comp:"Capability evaluation"},
+  {name:"State of GPT — Andrej Karpathy, Microsoft Build",type:"video",cost:"free",url:"https://www.youtube.com/watch?v=bZQun8Y4L2A",desc:"Covers fine-tuning, prompting strategy, and the LLM ecosystem. Essential for understanding model types.",forLv:[3,4],comp:"LLM mechanics"},
+],
+d2:[
+  {name:"Competing in the Age of AI — Iansiti & Lakhani",type:"book",cost:"paid",url:"https://www.amazon.com/Competing-Age-AI-Leadership-Algorithms/dp/1633697622",desc:"The best AI product strategy book. Covers data network effects, AI factory models, and operating model transformation.",forLv:[1,2],comp:"AI product strategy",pri:true},
+  {name:"Prediction Machines — Agrawal, Gans & Goldfarb",type:"book",cost:"paid",url:"https://www.amazon.com/Prediction-Machines-Economics-Artificial-Intelligence/dp/1633695670",desc:"Reframes AI as prediction cost reduction. Gives a durable mental model for identifying AI opportunities.",forLv:[1,2],comp:"AI product strategy",pri:true},
+  {name:"Software 2.0 — Andrej Karpathy (Medium)",type:"article",cost:"free",url:"https://karpathy.medium.com/software-2-0-a64152b37c35",desc:"Short foundational essay on why AI-native products are architecturally different from traditional software.",forLv:[1,2],comp:"AI product strategy"},
+  {name:"The New Moats — Jerry Chen, Greylock",type:"article",cost:"free",url:"https://greylock.com/greymatter/the-new-moats/",desc:"Covers AI-era defensibility and what creates durable competitive advantage in AI products.",forLv:[2,3],comp:"AI product strategy"},
+  {name:"Who Owns the Generative AI Platform? — a16z",type:"article",cost:"free",url:"https://a16z.com/who-owns-the-generative-ai-platform/",desc:"Analyses where value accrues in the AI stack — infrastructure, model, or application layer.",forLv:[2,3],comp:"AI product strategy"},
+  {name:"AI Product Management Specialization — Duke/Coursera",type:"course",cost:"paid",url:"https://www.coursera.org/specializations/ai-product-management-duke",desc:"Three-course series covering AI product strategy, building AI products, and managing AI.",forLv:[1,2],comp:"Opportunity identification"},
+  {name:"7 Powers — Hamilton Helmer",type:"book",cost:"paid",url:"https://www.amazon.com/7-Powers-Foundations-Business-Strategy/dp/0998116319",desc:"Not AI-specific, but essential for the competitive moats module. Applies directly to data flywheels.",forLv:[3,4],comp:"AI product strategy"},
+  {name:"The Economics of Generative AI — a16z",type:"article",cost:"free",url:"https://a16z.com/the-economics-of-generative-ai/",desc:"Analyses cost structures, inference economics, and where the money flows in AI products.",forLv:[2,3],comp:"AI economics"},
+],
+d3:[
+  {name:"Prompt Engineering Guide — Anthropic",type:"docs",cost:"free",url:"https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview",desc:"Primary source. Complete guide to system prompts, few-shot examples, chain-of-thought, and guardrails.",forLv:[1,2],comp:"Prompt engineering",pri:true},
+  {name:"ChatGPT Prompt Engineering for Developers — DeepLearning.AI",type:"course",cost:"free",url:"https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/",desc:"Hands-on, short, accessible to non-engineers. Best starting point for practical prompt writing.",forLv:[1,2],comp:"Prompt engineering"},
+  {name:"Building Effective Agents — Anthropic",type:"docs",cost:"free",url:"https://www.anthropic.com/engineering/building-effective-agents",desc:"Anthropic's own guidance on agent architecture patterns, tool design, and production considerations. Required reading.",forLv:[2,3],comp:"Agent specification",pri:true},
+  {name:"LangChain for LLM Application Development — DeepLearning.AI",type:"course",cost:"free",url:"https://www.deeplearning.ai/short-courses/langchain-for-llm-application-development/",desc:"Covers chains, agents, memory, and tool use. Gives vocabulary to lead engineering conversations.",forLv:[2,3],comp:"Agent specification"},
+  {name:"Evaluating and Debugging Generative AI — DeepLearning.AI",type:"course",cost:"free",url:"https://www.deeplearning.ai/short-courses/evaluating-debugging-generative-ai/",desc:"One of the only courses that covers evals systematically. Directly relevant to evaluation design.",forLv:[2,3],comp:"Evaluation design",pri:true},
+  {name:"Designing Machine Learning Systems — Chip Huyen",type:"book",cost:"paid",url:"https://www.amazon.com/Designing-Machine-Learning-Systems-Production-Ready/dp/1098107969",desc:"Best systems-thinking book for ML in production. Evaluation, monitoring, and deployment chapters are PM-accessible.",forLv:[3,4],comp:"Observability"},
+  {name:"Building Systems with the ChatGPT API — DeepLearning.AI",type:"course",cost:"free",url:"https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/",desc:"Covers multi-step LLM pipelines. Useful for understanding how to spec complex AI feature flows.",forLv:[2,3],comp:"AI feature specification"},
+  {name:"Anthropic Tool Use Documentation",type:"docs",cost:"free",url:"https://docs.anthropic.com/en/docs/build-with-claude/tool-use",desc:"Primary source for tool use patterns. Directly relevant to agent specification and hands-on prototyping.",forLv:[2,3],comp:"Hands-on prototyping"},
+],
+d4:[
+  {name:"NIST AI Risk Management Framework",type:"docs",cost:"free",url:"https://www.nist.gov/artificial-intelligence/ai-risk-management-framework",desc:"The US federal framework for AI risk. The Govern and Manage sections are most relevant for PMs.",forLv:[2,3],comp:"AI risk classification",pri:true},
+  {name:"EU AI Act — Plain Language Guide",type:"docs",cost:"free",url:"https://artificialintelligenceact.eu/",desc:"Essential for PMs building for European markets. Risk tier classification directly applicable to product decisions.",forLv:[2,3],comp:"Regulatory landscape"},
+  {name:"Weapons of Math Destruction — Cathy O'Neil",type:"book",cost:"paid",url:"https://www.amazon.com/Weapons-Math-Destruction-Increases-Inequality/dp/0553418815",desc:"Accessible, case-study-driven treatment of algorithmic bias and real-world consequences.",forLv:[1,2],comp:"Responsible AI design"},
+  {name:"Anthropic Responsible Scaling Policy",type:"docs",cost:"free",url:"https://www.anthropic.com/responsible-scaling-policy",desc:"Primary source. How a leading AI company operationalises safety governance in practice.",forLv:[2,3],comp:"AI governance design",pri:true},
+  {name:"Microsoft Responsible AI Standard",type:"docs",cost:"free",url:"https://blogs.microsoft.com/on-the-issues/2022/06/21/microsofts-responsible-ai-standard-v2-general-requirements/",desc:"One of the most operationalised corporate AI governance frameworks publicly available.",forLv:[3,4],comp:"AI governance design"},
+  {name:"Trustworthy AI — IBM SkillsBuild",type:"course",cost:"free",url:"https://skillsbuild.org/",desc:"Covers bias, explainability, and governance from a practitioner perspective. More applied than academic courses.",forLv:[1,2],comp:"Responsible AI design"},
+  {name:"Atlas of AI — Kate Crawford",type:"book",cost:"paid",url:"https://www.amazon.com/Atlas-AI-Kate-Crawford/dp/0300264631",desc:"The most rigorous treatment of AI's social and political implications. Chapter 5 on classification is essential.",forLv:[2,3],comp:"Responsible AI design"},
+  {name:"The Coming Wave — Mustafa Suleyman",type:"book",cost:"paid",url:"https://www.amazon.com/Coming-Wave-Technology-Twenty-first-Centurys/dp/0593593952",desc:"Chapters 10–12 on organisational and societal implications relevant to the transformation leadership competency.",forLv:[2,3],comp:"AI transformation leadership"},
+]};
+
+const DOM=[
+{id:"d1",code:"D1",label:"AI Fluency",tc:"td1",lpc:"#0EA5A0",
+ comps:[
+  {id:"c01",code:"D1.K1",type:"K",name:"LLM mechanics and limitations",levels:[{k:"Can name what an LLM is",d:"Uses AI tools as a black box"},{k:"Understands tokens, context, temperature",d:"Explains model failures to stakeholders"},{k:"Understands pre-training, fine-tuning, RLHF",d:"Sets realistic expectations in specs"},{k:"Critically evaluates model capability claims",d:"Designs features around model limits proactively"}],inds:["Can explain why an LLM hallucinated in a specific case","Knows what a context window limit means for a feature","Can read a model card and extract product-relevant info","Understands base model vs instruction-tuned model"]},
+  {id:"c02",code:"D1.K2",type:"K",name:"The AI product stack",levels:[{k:"Aware AI products involve more than a model",d:"Cannot distinguish prompt vs infrastructure issues"},{k:"Names the layers: model, RAG, prompt, orchestration",d:"Draws a basic stack diagram"},{k:"Understands trade-offs at each layer",d:"Diagnoses failures at the correct stack layer"},{k:"Evaluates architectural decisions with full awareness",d:"Advises engineering on stack design"}],inds:["Can produce a labelled stack diagram","Can explain when RAG beats fine-tuning","Knows what vector databases are for","Identifies failure layer from an incident description"]},
+  {id:"c03",code:"D1.K3",type:"K",name:"Agent architecture concepts",levels:[{k:"Has heard the term 'AI agent'",d:"Cannot distinguish agent from simple LLM call"},{k:"Describes the 4 agent components",d:"Sketches a basic single-agent architecture"},{k:"Understands ReAct, plan-and-execute, multi-agent",d:"Selects appropriate patterns for scenarios"},{k:"Evaluates architecture for reliability/cost/debuggability",d:"Leads architecture decisions with engineering"}],inds:["Can sketch an agent architecture for customer support","Understands tool-calling and why descriptions matter","Can identify agentic failure modes","Knows single vs multi-agent tradeoffs"]},
+  {id:"c04",code:"D1.K4",type:"K",name:"Multimodal capabilities",levels:[{k:"Aware AI can process images",d:"Cannot evaluate whether multimodal adds value"},{k:"Names modalities: vision, audio, code, data",d:"Identifies basic use cases per modality"},{k:"Understands reliability profiles and cost implications",d:"Makes informed modality selection decisions"},{k:"Evaluates multimodal roadmaps vs product strategy",d:"Identifies novel multimodal opportunities"}],inds:["Distinguishes genuine value vs novelty for vision AI","Knows which modalities are mature vs experimental","Can design fallback when a modality fails","Understands cost/latency of multimodal calls"]},
+  {id:"c05",code:"D1.S1",type:"S",name:"Evaluating model capability claims",levels:[{k:"Aware benchmarks exist",d:"Accepts vendor claims at face value"},{k:"Can read MMLU and Arena leaderboards",d:"Asks basic questions when evaluating a model"},{k:"Understands benchmark limits and contamination risks",d:"Designs capability probes for a use case"},{k:"Runs rigorous capability evaluations",d:"Produces vendor evaluation briefs"}],inds:["Has designed and run a capability probe","Can explain why high benchmark ≠ production performance","Uses structured rubrics for model output evaluation","Has written a vendor AI evaluation brief"]},
+  {id:"c06",code:"D1.S2",type:"S",name:"Communicating AI concepts",levels:[{k:"Understands some AI concepts personally",d:"Struggles to explain AI to non-technical stakeholders"},{k:"Explains core concepts simply",d:"Answers stakeholder questions without over-simplifying"},{k:"Adapts communication depth to audience",d:"Writes AI briefings executives can act on"},{k:"Shapes organisational AI understanding",d:"Establishes shared vocabulary for AI org-wide"}],inds:["Can explain hallucination to a CFO in 60 seconds","Has written an AI brief for non-technical audience","Uses analogies without sacrificing accuracy","Communicates both AI potential and limitations honestly"]},
+]},
+{id:"d2",code:"D2",label:"Strategy & Scoping",tc:"td2",lpc:"#7C5CFC",
+ comps:[
+  {id:"c07",code:"D2.K1",type:"K",name:"AI product strategy fundamentals",levels:[{k:"Aware AI is strategically important",d:"Cannot articulate why AI needs different strategy"},{k:"Explains data network effects and prediction cost reduction",d:"Classifies products as AI-native vs AI-enhanced"},{k:"Applies Iansiti/Lakhani and 7 Powers to AI",d:"Evaluates competitive moats analytically"},{k:"Synthesises frameworks to diagnose AI competitive dynamics",d:"Produces AI strategy briefs with second-order effects"}],inds:["Can explain data network effects and moat limits","Classifies AI-native vs AI-enhanced with justification","Applies prediction cost reduction to identify opportunities","Articulates why fine-tuning may be a weak moat"]},
+  {id:"c08",code:"D2.S1",type:"S",name:"AI opportunity identification",levels:[{k:"Identifies obvious AI opportunities",d:"Relies on engineering suggestions for discovery"},{k:"Uses jobs-to-be-done to surface latent AI needs",d:"Generates scored AI opportunity lists"},{k:"Applies prototype-first and wizard-of-oz methods",d:"Runs structured AI discovery sprints"},{k:"Designs programmes surfacing non-obvious opportunities",d:"Builds org-wide AI opportunity pipelines"}],inds:["Has used wizard-of-oz to validate an AI concept","Distinguishes latent from expressed AI needs","Has completed an AI Opportunity Canvas","Can score and rank AI use cases with a framework"]},
+  {id:"c09",code:"D2.S2",type:"S",name:"Use case prioritisation and ROI modelling",levels:[{k:"Aware not all AI use cases are equally valuable",d:"Prioritises by gut or stakeholder pressure"},{k:"Uses scoring matrix with value and feasibility",d:"Produces prioritised list with rationale"},{k:"Builds ROI models with inference cost and error rate",d:"Presents roadmaps with economic logic"},{k:"Runs sensitivity analysis for AI investments",d:"Produces board-ready AI investment cases"}],inds:["Has built an ROI model including inference cost","Has presented a prioritised AI roadmap to senior stakeholders","Explains why feasible ≠ commercially viable","Accounts for error rate costs in value modelling"]},
+  {id:"c10",code:"D2.S3",type:"S",name:"AI economics and build/buy/fine-tune",levels:[{k:"Aware AI has cost implications",d:"Defers economics to finance without contributing"},{k:"Can read a model pricing page",d:"Flags economic concerns for others to resolve"},{k:"Models cost-per-interaction, margin impact, upgrade economics",d:"Presents AI economics briefings CFOs can act on"},{k:"Optimises AI cost architecture across the stack",d:"Drives build/buy/fine-tune with full justification"}],inds:["Has modelled cost of 1M API calls for a use case","Can explain margin implications of a model upgrade","Has produced an AI economics brief for finance","Knows when fine-tuning beats RAG at scale"]},
+  {id:"c11",code:"D2.S4",type:"S",name:"AI product discovery and validation",levels:[{k:"Familiar with standard discovery methods",d:"Applies traditional discovery without AI adaptation"},{k:"Understands why AI needs prototype-first discovery",d:"Runs basic prototype-first discovery"},{k:"Designs structured AI discovery programmes",d:"Produces validated AI product hypotheses"},{k:"Builds systematic feedback loops into AI products",d:"Teaches AI discovery methods to other PMs"}],inds:["Has run a prototype-first discovery sprint","Designs feedback collection into features at launch","Can identify latent vs expressed user needs","Has adapted wizard-of-oz pre-build"]},
+]},
+{id:"d3",code:"D3",label:"Building & Shipping",tc:"td3",lpc:"#3B82F6",
+ comps:[
+  {id:"c12",code:"D3.S1",type:"S",name:"Prompt engineering",levels:[{k:"Aware prompts affect model outputs",d:"Writes informal prompts without structure"},{k:"Uses system prompts, few-shot, chain-of-thought",d:"Writes structured prompts; iterates on quality"},{k:"Applies advanced techniques and output schemas",d:"Writes production-quality prompts with version history"},{k:"Designs prompt architectures for complex systems",d:"Reviews and improves prompts org-wide"}],inds:["Has written a production system prompt with guardrails","Version-controls prompts with change rationale","Can diagnose a failing prompt without trial-and-error","Has stress-tested a prompt with adversarial inputs"]},
+  {id:"c13",code:"D3.S2",type:"S",name:"Agent specification writing",levels:[{k:"Aware agents need more than user stories",d:"Writes agent requirements as traditional stories"},{k:"Knows components: role, tools, memory, escalation",d:"Drafts specs using template; misses edge cases"},{k:"Writes complete specs engineering can implement",d:"Specs include edge cases and acceptance criteria"},{k:"Anticipates engineering constraints in spec design",d:"Mentors others in agent specification"}],inds:["Has written an agent spec used in production","Defines every tool with typed inputs/outputs/errors","Specifies escalation paths for all failure modes","Writes acceptance criteria that can be tested programmatically"]},
+  {id:"c14",code:"D3.S3",type:"S",name:"Evaluation design",levels:[{k:"Aware AI outputs need evaluation",d:"Relies on subjective feedback rather than structure"},{k:"Can build a golden dataset and basic rubric",d:"Runs structured evals before launches"},{k:"Designs automated and human eval pipelines",d:"Uses eval results to drive product decisions"},{k:"Designs eval programmes tracking degradation over time",d:"Builds organisational evaluation culture"}],inds:["Has built a golden dataset of 50+ examples","Has written a human eval rubric with 5-point scoring","Sets pass/fail thresholds before every production launch","Has used eval results to kill a feature or reverse a change"]},
+  {id:"c15",code:"D3.S4",type:"S",name:"AI feature specification",levels:[{k:"Writes PRDs that mention AI without AI-specific fields",d:"Specs missing prompt, eval criteria, or rollback"},{k:"Uses AI feature spec template",d:"Produces specs engineering can implement; some gaps"},{k:"Writes comprehensive specs covering all AI fields",d:"Specs include confidence thresholds and staged rollout"},{k:"Defines specs as team templates",d:"Sets the standard for AI feature spec org-wide"}],inds:["Has written a spec including system prompt, eval criteria, rollback","Specifies monitoring requirements in every feature","Selects appropriate AI integration patterns","Designs staged rollout plans with exit criteria"]},
+  {id:"c16",code:"D3.S5",type:"S",name:"Hands-on AI prototyping",levels:[{k:"Relies entirely on engineering for prototypes",d:"Cannot validate AI assumptions without a developer"},{k:"Can configure a simple agent with guidance",d:"Builds basic prototypes to test assumptions"},{k:"Independently builds and deploys agent prototypes",d:"Uses prototypes to generate specific requirements"},{k:"Builds sophisticated prototypes approximating production",d:"Runs structured experiments with self-built prototypes"}],inds:["Has independently deployed an agent prototype","Has broken a prototype intentionally to find failures","Uses prototypes to validate prompts pre-spec","Can read a trace log and diagnose failures"]},
+  {id:"c17",code:"D3.S6",type:"S",name:"Observability and incident diagnosis",levels:[{k:"Knows AI systems can fail in production",d:"Escalates all issues to engineering without diagnosis"},{k:"Can read a trace log with guidance",d:"Defines basic monitoring requirements in specs"},{k:"Independently reads traces and diagnoses root cause",d:"Writes structured post-incident reports"},{k:"Designs observability requirements proactively",d:"Leads incident response and drives systemic improvements"}],inds:["Has read a trace log and identified a failure step","Defines alert thresholds in every AI feature spec","Has written a post-incident report for an AI failure","Distinguishes model vs prompt vs tool failures"]},
+  {id:"c18",code:"D3.K1",type:"K",name:"Fine-tuning and training programmes",levels:[{k:"Aware fine-tuning exists",d:"Cannot articulate when it beats prompting"},{k:"Understands conditions that make fine-tuning worthwhile",d:"Briefs engineering on fine-tuning decision with justification"},{k:"Knows how to spec training data and preference collection",d:"Writes fine-tuning briefs teams can execute against"},{k:"Evaluates fine-tuned models and manages the full programme",d:"Leads fine-tuning end-to-end including data governance"}],inds:["Can articulate 3 conditions that make fine-tuning preferable","Has written a training data specification","Understands what RLHF preference data collection involves","Knows how to evaluate a fine-tuned model for a use case"]},
+]},
+{id:"d4",code:"D4",label:"Governance & Leadership",tc:"td4",lpc:"#F59E0B",
+ comps:[
+  {id:"c19",code:"D4.K1",type:"K",name:"AI risk classification",levels:[{k:"Aware AI carries risks",d:"Does not integrate risk thinking into product planning"},{k:"Can classify features by risk tier",d:"Includes risk flags in specs; escalates high-risk items"},{k:"Applies NIST AI RMF and EU AI Act to decisions",d:"Designs appropriate oversight for each tier"},{k:"Builds risk classification into org product processes",d:"Advises on risk tier calibration for the full portfolio"}],inds:["Has classified AI features by risk tier","Can design minimum viable oversight for a high-risk feature","Knows audit trail requirements by risk tier","Integrates risk assessment into sprint planning"]},
+  {id:"c20",code:"D4.K2",type:"K",name:"Responsible AI design",levels:[{k:"Has heard of AI bias and fairness",d:"Does not proactively address responsible AI in feature work"},{k:"Can identify obvious bias risks and transparency obligations",d:"Includes basic bias checks in feature specs"},{k:"Applies structured responsible AI review to specs",d:"Designs user disclosures and fairness constraints"},{k:"Builds responsible AI review into team processes",d:"Establishes responsible AI standards for the org"}],inds:["Has conducted a responsible AI review with a structured checklist","Has designed a user disclosure for an AI feature","Can identify potential bias sources in a proposed feature","Knows demographic parity vs equalised odds"]},
+  {id:"c21",code:"D4.K3",type:"K",name:"Regulatory landscape",levels:[{k:"Aware AI regulation exists",d:"Does not factor regulation into product planning"},{k:"Names major frameworks and their scope",d:"Flags potential regulatory concerns for legal review"},{k:"Understands which tier applies to a product context",d:"Builds regulatory checkpoints into launch checklists"},{k:"Tracks regulatory developments proactively",d:"Briefs legal and leadership on regulatory implications"}],inds:["Can identify which frameworks apply to a given product","Knows when a decision requires legal/compliance review","Has built a regulatory checkpoint into a launch process","Can explain EU AI Act risk tiers to a non-specialist"]},
+  {id:"c22",code:"D4.S1",type:"S",name:"AI governance design",levels:[{k:"Aware governance is needed for AI",d:"Follows governance set by others; doesn't contribute to design"},{k:"Can describe governance components",d:"Contributes to governance design; writes basic AI standards"},{k:"Designs governance for org size and risk profile",d:"Produces ToR, model lifecycle policies, launch checklists"},{k:"Leads org-wide AI governance design and evolution",d:"Builds governance that scales with AI capability growth"}],inds:["Has written an AI standards document for a team","Has defined a model lifecycle policy","Can design an AI review board process","Knows what shared tooling a CoE should maintain"]},
+  {id:"c23",code:"D4.S2",type:"S",name:"AI transformation leadership",levels:[{k:"Aware AI transformation involves change management",d:"Focuses on tech delivery; underestimates resistance"},{k:"Understands common resistance patterns",d:"Anticipates stakeholder concerns; prepares comms plans"},{k:"Builds coalitions across engineering, legal, finance, business",d:"Leads structured change programmes for AI rollouts"},{k:"Shapes organisational AI strategy at executive level",d:"Builds lasting institutional AI capability"}],inds:["Has designed a stakeholder comms plan for AI initiative","Has navigated resistance from a non-technical group","Can sequence a rollout to build trust progressively","Has facilitated alignment across eng/legal/business on AI"]},
+  {id:"c24",code:"D4.S3",type:"S",name:"AI incident response",levels:[{k:"Aware AI incidents require a response",d:"Escalates incidents without PM-led coordination"},{k:"Knows elements of incident response",d:"Participates in response; drafts internal comms"},{k:"Leads end-to-end incident response including stakeholder comms",d:"Produces post-incident reports with product recommendations"},{k:"Designs incident runbooks proactively",d:"Leads organisational learning from AI incidents"}],inds:["Has led or participated in an AI incident response","Has written a post-incident report for an AI failure","Can draft internal and external comms for an incident","Has designed an incident response runbook"]},
+]},
+];
+
+let SC={},CK={},AF='all',RC=null,AD='d1';
+try{const s=localStorage.getItem('aipm_s');if(s)SC=JSON.parse(s);const c=localStorage.getItem('aipm_c');if(c)CK=JSON.parse(c);}catch(e){}
+function save(){try{localStorage.setItem('aipm_s',JSON.stringify(SC));localStorage.setItem('aipm_c',JSON.stringify(CK));}catch(e){}}
+
+function buildUI(){
+  const te=document.getElementById('dtabs'),pe=document.getElementById('dpanels');
+  DOM.forEach(d=>{
+    const rated=d.comps.filter(c=>SC[c.id]).length;
+    const btn=document.createElement('button');
+    btn.className=`dtab ${d.tc}${d.id===AD?' on':''}`;
+    btn.id='tb-'+d.id;
+    btn.innerHTML=`${d.code} — ${d.label} <span class="tpip">${rated}/${d.comps.length}</span>`;
+    btn.onclick=()=>sd(d.id);
+    te.appendChild(btn);
+    const panel=document.createElement('div');
+    panel.id='pn-'+d.id;
+    panel.className='cgrid';
+    panel.style.display=d.id===AD?'block':'none';
+    d.comps.forEach(c=>{const div=document.createElement('div');div.className='ccard';div.id='cc-'+c.id;div.innerHTML=bcc(c,SC[c.id]||0,d);panel.appendChild(div);});
+    pe.appendChild(panel);
+  });
+}
+
+function sd(did){
+  AD=did;
+  DOM.forEach(d=>{
+    document.getElementById('tb-'+d.id)?.classList.toggle('on',d.id===did);
+    const p=document.getElementById('pn-'+d.id);if(p)p.style.display=d.id===did?'block':'none';
+  });
+}
+
+function bcc(c,sc,d){
+  const lpc=sc?`lp${sc}`:'lp0';
+  const lpt=sc?`${sc} — ${LV[sc-1].nm}`:'Not rated';
+  const sst=sc?`background:${LV[sc-1].c}22;color:${LV[sc-1].c};border-color:${LV[sc-1].c}44`:'';
+  const lgc=LV.map((lv,li)=>`<div class="lgc l${li+1}${sc===li+1?' sel':''}" onclick="selLv('${c.id}','${d.id}',${li+1})">
+    <div class="lgn">${lv.n}</div><div class="lgnm">${lv.nm}</div>
+    <div class="lgl">Knows</div><div class="lgd">${c.levels[li].k}</div>
+    <div class="lgl">Does</div><div class="lgd">${c.levels[li].d}</div>
+  </div>`).join('');
+  const iit=c.inds.map((ind,ii)=>{const k=CK[c.id+'-'+ii];return`<div class="iitem${k?' chk':''}" onclick="togInd('${c.id}',${ii})"><div class="ichk">${k?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</div><div class="itxt">${ind}</div></div>`;}).join('');
+  return`<div class="chdr" onclick="togCard('${c.id}')">
+    <div class="cstat" style="${sst}">${sc||'·'}</div>
+    <div class="cinfo"><div class="ccode">${c.code}</div><div class="cname">${c.name}</div><div class="cmeta"><span class="ttag t${c.type.toLowerCase()}">${c.type==='K'?'Knowledge':'Skill'}</span></div></div>
+    <div class="cright"><span class="lpill ${lpc}">${lpt}</span><div class="xicon" id="xi-${c.id}"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4.5l5 5 5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+  </div>
+  <div class="cbody" id="cb-${c.id}"><div class="cinner">
+    <div class="lgrid">${lgc}</div>
+    <div class="isect"><div class="ilbl">Observable indicators — check which apply</div><div class="igrid">${iit}</div></div>
+  </div></div>`;
+}
+
+function togCard(cid){
+  const b=document.getElementById('cb-'+cid),x=document.getElementById('xi-'+cid),c=document.getElementById('cc-'+cid);
+  const o=b.classList.contains('open');
+  b.classList.toggle('open',!o);x.classList.toggle('open',!o);c.classList.toggle('exp',!o);
+}
+
+function selLv(cid,did,lv){
+  SC[cid]=lv;save();
+  const d=DOM.find(d=>d.id===did),c=d.comps.find(c=>c.id===cid);
+  const card=document.getElementById('cc-'+cid);
+  const wasOpen=document.getElementById('cb-'+cid)?.classList.contains('open');
+  card.innerHTML=bcc(c,lv,d);
+  if(wasOpen){document.getElementById('cb-'+cid).classList.add('open');document.getElementById('xi-'+cid).classList.add('open');card.classList.add('exp');}
+  updTab(did);updProg();
+  toast(`Level ${lv} — ${LV[lv-1].nm} saved`);
+}
+
+function togInd(cid,idx){
+  const k=cid+'-'+idx;CK[k]=!CK[k];save();
+  const items=document.querySelectorAll(`#cc-${cid} .iitem`);
+  const item=items[idx];const chk=item?.querySelector('.ichk');
+  if(!item)return;
+  item.classList.toggle('chk',CK[k]);
+  if(chk)chk.innerHTML=CK[k]?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';
+}
+
+function updTab(did){
+  const d=DOM.find(d=>d.id===did);
+  const rated=d.comps.filter(c=>SC[c.id]).length;
+  const tab=document.getElementById('tb-'+did);
+  if(tab)tab.querySelector('.tpip').textContent=`${rated}/${d.comps.length}`;
+}
+
+function updProg(){
+  const all=DOM.flatMap(d=>d.comps);
+  const tot=all.length,rated=all.filter(c=>SC[c.id]).length;
+  const pct=Math.round(rated/tot*100);
+  document.getElementById('cbf').style.width=pct+'%';
+  document.getElementById('cbp').textContent=rated+' / '+tot;
+  document.getElementById('vrBtn').style.display=rated>=6?'flex':'none';
+  DOM.forEach(d=>{
+    const rc=d.comps.filter(c=>SC[c.id]);
+    const avg=rc.length>0?rc.reduce((s,c)=>s+(SC[c.id]||0),0)/rc.length:0;
+    const bf=document.getElementById('b-'+d.id),vf=document.getElementById('v-'+d.id);
+    if(bf)bf.style.width=Math.round(avg/4*100)+'%';
+    if(vf)vf.textContent=rc.length>0?avg.toFixed(1):'—';
+  });
+  const sc2=all.filter(c=>SC[c.id]);
+  const oa=sc2.length>0?sc2.reduce((s,c)=>s+SC[c.id],0)/sc2.length:0;
+  const p=getP(oa,sc2.length);
+  const hs=document.getElementById('hs'),hl=document.getElementById('hl'),rpt=document.getElementById('rpt');
+  if(hs)hs.textContent=oa>0?oa.toFixed(1):'—';
+  if(hl)hl.textContent=p.nm;
+  if(rpt)rpt.textContent=p.nm;
+}
+
+function getP(avg,n){
+  if(n<6)return{nm:'Not yet started',desc:'Complete at least 6 competencies to generate your profile.'};
+  if(avg<1.8)return{nm:'Pre-course learner',desc:'You have awareness of AI PM concepts but are building foundational knowledge. This course is the right starting point.',c:'#EF4444'};
+  if(avg<2.5)return{nm:'Developing practitioner',desc:'Working knowledge across several domains with meaningful gaps in hands-on skills. Focus on Domains 2 and 3 to build applied capability.',c:'#F59E0B'};
+  if(avg<3.3)return{nm:'Proficient AI PM',desc:'Solid knowledge and skills across most areas. Focus on advanced competencies in governance, evaluation design, and agentic systems.',c:'#3B82F6'};
+  return{nm:'Advanced AI PM',desc:'Strong competency across the framework. Focus on organisational leadership, governance design, and emerging capabilities.',c:'#10B981'};
+}
+
+function showR(){sv('r');}
+
+function sv(v){
+  document.getElementById('aView').style.display=v==='a'?'block':'none';
+  document.getElementById('rView').style.display=v==='r'?'block':'none';
+  document.getElementById('nb0').classList.toggle('on',v==='a');
+  document.getElementById('nb1').classList.toggle('on',v==='r');
+  if(v==='r')renderR();
+}
+
+function renderR(){
+  const all=DOM.flatMap(d=>d.comps);
+  const sc2=all.filter(c=>SC[c.id]);
+  const oa=sc2.length>0?sc2.reduce((s,c)=>s+SC[c.id],0)/sc2.length:0;
+  const p=getP(oa,sc2.length);
+  const prof=Object.values(SC).filter(s=>s>=3).length;
+  const gaps=Object.values(SC).filter(s=>s<=2).length;
+  document.getElementById('rln').textContent=p.nm;
+  document.getElementById('rln').style.color=p.c||'var(--teal)';
+  document.getElementById('rld').textContent=p.desc;
+  document.getElementById('rm1').textContent=oa>0?oa.toFixed(1):'—';
+  document.getElementById('rm2').textContent=sc2.length+'/24';
+  document.getElementById('rm3').textContent=prof;
+  document.getElementById('rm4').textContent=gaps;
+  document.getElementById('hmc').textContent=sc2.length+' rated';
+  document.getElementById('lpc').textContent='Prioritised by your gaps';
+  renderHM();renderRadar();renderLP();
+}
+
+function renderHM(){
+  const el=document.getElementById('hmg');el.innerHTML='';
+  const all=DOM.flatMap(d=>d.comps);
+  const sorted=[...all].sort((a,b)=>(SC[a.id]||5)-(SC[b.id]||5));
+  sorted.forEach(c=>{const s=SC[c.id]||0;const div=document.createElement('div');div.className=`hmcell ${s?'hm'+s:'hmx'}`;div.innerHTML=`<div class="hmname">${c.name}</div><div class="hmscore">${s||'—'}</div>`;el.appendChild(div);});
+}
+
+function renderRadar(){
+  if(RC){RC.destroy();RC=null;}
+  const data=DOM.map(d=>{const rc=d.comps.filter(c=>SC[c.id]);return rc.length>0?parseFloat((rc.reduce((s,c)=>s+SC[c.id],0)/rc.length).toFixed(2)):0;});
+  const ctx=document.getElementById('rc').getContext('2d');
+  RC=new Chart(ctx,{type:'radar',data:{labels:DOM.map(d=>d.label),datasets:[{data,backgroundColor:'rgba(14,165,160,.15)',borderColor:'#0EA5A0',borderWidth:2,pointBackgroundColor:'#0EA5A0',pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:4,ticks:{stepSize:1,color:'#64748B',font:{size:11,family:'DM Sans'},backdropColor:'transparent'},grid:{color:'rgba(255,255,255,.06)'},angleLines:{color:'rgba(255,255,255,.06)'},pointLabels:{color:'#94A3B8',font:{size:12,family:'DM Sans'}}}}}});
+}
+
+function renderLP(){
+  const el=document.getElementById('lp');el.innerHTML='';
+  const dcols=['#0EA5A0','#7C5CFC','#3B82F6','#F59E0B'];
+  const dbadge=['tbd1','tbd2','tbd3','tbd4'];
+  DOM.forEach((d,di)=>{
+    const gc=d.comps.filter(c=>SC[c.id]&&SC[c.id]<=2);
+    const avg=d.comps.filter(c=>SC[c.id]).length>0?d.comps.filter(c=>SC[c.id]).reduce((s,c)=>s+(SC[c.id]||0),0)/d.comps.filter(c=>SC[c.id]).length:0;
+    const res=RES[d.id]||[];
+    const fil=fRes(res,gc,avg);
+    if(!fil.length)return;
+    const sec=document.createElement('div');sec.className='lpdomain';sec.id='ls-'+d.id;
+    sec.innerHTML=`<div class="lpdhdr"><span class="lpdbadge ${dbadge[di]}">${d.code}</span><span class="lpdtitle">${d.label}</span><span class="lpdgap">${gc.length>0?gc.length+' gap area'+(gc.length>1?'s':''):'Expand depth'}</span></div><div class="lpres" id="lr-${d.id}"></div>`;
+    el.appendChild(sec);
+    const re=document.getElementById('lr-'+d.id);
+    fil.forEach(r=>{
+      const isp=r.pri&&gc.length>0;
+      const tags=[`<span class="rtag r${r.cost}">${r.cost}</span>`,`<span class="rtag r${r.type}">${r.type}</span>`,isp?`<span class="rtag rpri">priority</span>`:''].join('');
+      const why=gWhy(r,gc,avg);
+      const item=document.createElement('div');item.className='lpr';
+      item.setAttribute('data-cost',r.cost);item.setAttribute('data-type',r.type);item.setAttribute('data-pri',isp?'1':'0');
+      item.innerHTML=`<div class="lpra" style="background:${dcols[di]}"></div><div class="lprb">
+        <div class="lprtop"><div class="lprname">${r.name}</div><div class="lprtags">${tags}</div></div>
+        <div class="lprdesc">${r.desc}</div>
+        <a href="${r.url}" target="_blank" rel="noopener" class="lprlink">Visit resource <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        ${why?`<div class="lprwhy">${why}</div>`:''}
+      </div>`;
+      re.appendChild(item);
+    });
+  });
+}
+
+function fRes(res,gc,avg){
+  return res.filter(r=>{
+    if(AF==='free')return r.cost==='free';
+    if(AF==='video')return r.type==='video';
+    if(AF==='book')return r.type==='book';
+    if(AF==='course')return r.type==='course';
+    if(AF==='gaps')return r.pri||(gc.length>0&&r.forLv.some(l=>l<=Math.ceil(avg)));
+    return true;
+  });
+}
+function gWhy(r,gc,avg){
+  if(gc.length>0&&r.pri)return'Recommended because you have gap areas in this domain.';
+  if(avg<2&&r.forLv.includes(1))return'Starting resource — matches your current foundational level.';
+  if(avg>=3&&r.forLv.includes(4))return'Advanced resource — appropriate for your proficiency level.';
+  return'';
+}
+function sf(f,btn){AF=f;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderLP();}
+
+function dlPDF(){
+  toast('Generating PDF report…');
+  setTimeout(()=>{
+    try{
+      const{jsPDF}=window.jspdf;
+      const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      const W=210,M=18;let y=0;
+      const all=DOM.flatMap(d=>d.comps);
+      const sc2=all.filter(c=>SC[c.id]);
+      const oa=sc2.length>0?sc2.reduce((s,c)=>s+SC[c.id],0)/sc2.length:0;
+      const p=getP(oa,sc2.length);
+      const dc=[[14,165,160],[124,92,252],[59,130,246],[245,158,11]];
+
+      // Page 1 — Cover
+      doc.setFillColor(13,27,42);doc.rect(0,0,W,297,'F');
+      doc.setFillColor(14,165,160,15);doc.circle(W+10,0,90,'F');
+      doc.setFillColor(124,92,252,10);doc.circle(-10,297,80,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(14,165,160);
+      doc.text('BUILDING WITH AI — AI PM COMPETENCY ASSESSMENT',M,28);
+      doc.setFontSize(26);doc.setTextColor(240,244,248);
+      doc.text('AI Product Manager',M,46);doc.text('Competency Report',M,58);
+      doc.setDrawColor(14,165,160);doc.setLineWidth(.5);doc.line(M,64,M+120,64);
+      doc.setFont('helvetica','normal');doc.setFontSize(11);doc.setTextColor(148,163,184);
+      doc.text('Personalised readiness profile and learning path',M,72);
+      y=92;
+      const meta=[[`Readiness level`,p.nm],[`Overall average`,oa>0?oa.toFixed(1)+' / 4.0':'—'],[`Competencies rated`,sc2.length+' / 24'],[`Assessment date`,new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})]];
+      meta.forEach(([l,v])=>{
+        doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(100,116,139);doc.text(l,M,y);
+        doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(240,244,248);doc.text(v,M,y+5);y+=14;
+      });
+      y+=8;
+      doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(148,163,184);
+      const dl=doc.splitTextToSize(p.desc||'',W-M*2);doc.text(dl,M,y);y+=dl.length*5+16;
+      doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(14,165,160);
+      doc.text('DOMAIN SCORES',M,y);y+=8;
+      DOM.forEach((d,di)=>{
+        const rc=d.comps.filter(c=>SC[c.id]);
+        const avg2=rc.length>0?rc.reduce((s,c)=>s+SC[c.id],0)/rc.length:0;
+        doc.setFillColor(...dc[di]);doc.rect(M,y,3,6,'F');
+        doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(240,244,248);
+        doc.text(`${d.code} — ${d.label}`,M+7,y+4.5);
+        doc.setFont('helvetica','bold');doc.text(avg2>0?avg2.toFixed(1):'—',W-M,y+4.5,{align:'right'});
+        const bw=55,bx=W-M-bw-18,by=y+2;
+        doc.setFillColor(30,41,55);doc.rect(bx,by,bw,2.5,'F');
+        doc.setFillColor(...dc[di]);doc.rect(bx,by,bw*avg2/4,2.5,'F');
+        y+=11;
+      });
+
+      // Page 2 — Competency detail
+      doc.addPage();doc.setFillColor(13,27,42);doc.rect(0,0,W,297,'F');
+      y=M+5;
+      doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(14,165,160);
+      doc.text('Competency Scores',M,y);y+=12;
+      DOM.forEach((d,di)=>{
+        if(y>265){doc.addPage();doc.setFillColor(13,27,42);doc.rect(0,0,W,297,'F');y=M+5;}
+        doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...dc[di]);
+        doc.text(d.label.toUpperCase(),M,y);y+=6;
+        d.comps.forEach(c=>{
+          if(y>275){doc.addPage();doc.setFillColor(13,27,42);doc.rect(0,0,W,297,'F');y=M+5;}
+          const s=SC[c.id];
+          doc.setFont('helvetica','normal');doc.setFontSize(8);
+          doc.setTextColor(s?[...[[239,68,68],[245,158,11],[59,130,246],[16,185,129]][s-1]]:[100,116,139]);
+          doc.text(`• ${c.name}`,M+3,y);
+          doc.setFont('helvetica','bold');doc.text(s?`${s} — ${LV[s-1].nm}`:'Not rated',W-M,y,{align:'right'});
+          y+=5.5;
+        });y+=4;
+      });
+
+      // Page 3 — Learning path
+      doc.addPage();doc.setFillColor(13,27,42);doc.rect(0,0,W,297,'F');
+      y=M+5;
+      doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(14,165,160);
+      doc.text('Personalised Learning Path',M,y);y+=5;
+      doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(94,106,125);
+      doc.text('Resources prioritised based on your gap areas',M,y+5);y+=14;
+      DOM.forEach((d,di)=>{
+        const gc=d.comps.filter(c=>SC[c.id]&&SC[c.id]<=2);
+        const res=RES[d.id]||[];
+        const top=res.filter(r=>gc.length>0?r.pri:true).slice(0,3);
+        if(!top.length)return;
+        if(y>265){doc.addPage();doc.setFillColor(13,27,42);doc.rect(0,0,W,297,'F');y=M+5;}
+        doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...dc[di]);
+        doc.text(d.label,M,y);y+=7;
+        top.forEach(r=>{
+          if(y>275){doc.addPage();doc.setFillColor(13,27,42);doc.rect(0,0,W,297,'F');y=M+5;}
+          doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(240,244,248);
+          doc.text(`• ${r.name}`,M+3,y);y+=4.5;
+          doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(100,116,139);
+          const ls=doc.splitTextToSize(r.desc,W-M*2-6);doc.text(ls,M+6,y);y+=ls.length*3.5+2;
+          doc.setTextColor(14,165,160);doc.text(r.url,M+6,y);y+=6;
+        });y+=3;
+      });
+
+      doc.save('AI-PM-Competency-Report.pdf');
+      toast('PDF downloaded successfully');
+    }catch(e){toast('PDF generation failed — try again');console.error(e);}
+  },80);
+}
+
+function copyLink(){
+  const str=Object.entries(SC).map(([k,v])=>k+':'+v).join(',');
+  const url=window.location.href.split('?')[0]+'?s='+encodeURIComponent(btoa(str));
+  navigator.clipboard.writeText(url).then(()=>toast('Share link copied to clipboard'));
+}
+
+function loadURL(){
+  const p=new URLSearchParams(window.location.search),s=p.get('s');
+  if(!s)return;
+  try{atob(decodeURIComponent(s)).split(',').forEach(pair=>{const[k,v]=pair.split(':');if(k&&v)SC[k]=parseInt(v);});save();}catch(e){}
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('tmsg').textContent=msg;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+loadURL();buildUI();updProg();
+</script>
+</body>
+</html>
